@@ -14,20 +14,22 @@ http.createServer( (req, res) => {
 function getTranslate( text, res ) {
     const apiKey = 'trnsl.1.1.20160402T194715Z.af3cd6659bf20581.ff6fb5aa234633123721e33b291be2805c0a30f2';
     const url = 'https://translate.yandex.net/api/v1.5/tr.json/translate?key=' + apiKey + '&lang=en-ru' + '&text=' + text;
-    request( url, ( error, response, body ) => {
-        if( error ) {
-            console.log( error );
-            res.write( 'Error happend!' );
+    request( { method: 'GET', uri: url, json: true},
+        ( error, response, body ) => {
+            if( error ) {
+                console.log( error );
+                res.write( 'Error happend!' );
+                res.end();
+                return;
+            };
+            if( response.statusCode != 200 ) {
+                res.write( 'Ошибка! Сервер вернул статус "' + response.statusCode + '"' );
+                res.end();
+                return;
+            }
+            //const answer = JSON.parse( body ).text[0];
+            const answer = body.text[0];
+            res.write( answer );
             res.end();
-            return;
-        };
-        if( response.statusCode != 200 ) {
-            res.write( 'Ошибка! Сервер вернул статус "' + response.statusCode + '"' );
-            res.end();
-            return;
-        }
-        const answer = JSON.parse( body ).text[0];
-        res.write( answer );
-        res.end();
     });
 }
